@@ -239,19 +239,7 @@ define([
          */
         accept: function (file, callback) {
             this.createMendixFile(file, dojoLang.hitch(this, function(obj) {
-                if (obj) {
-                    var ref = this.contextassociation.split("/");
-                    if (obj.has(ref[0]) && this._contextObj) {
-                        obj.set(ref[0], this._contextObj.getGuid());
-                    }
-                    obj.set(this.nameattr, file.name);
-                    if (this.typeattr) {
-                        obj.set(this.typeattr, file.type);
-                    }
-                    this.acceptMendix(file, callback);
-                } else {
-                    callback("Failed to create new file object");
-                }
+                this.acceptMendix(file, callback);
             }));
         },
         /**
@@ -297,9 +285,23 @@ define([
             logger.debug(this.id + ".createMendixFile", file.name);
             mx.data.create({
                 entity: this.imageentity,
-                callback: dojoLang.hitch(this, function (obj) {
+                callback: dojoLang.hitch(this, function (obj) {                    
                     logger.debug("create", obj.getGuid());
-                    file.obj = obj;
+
+                    if (obj) {
+                        var ref = this.contextassociation.split("/");
+                        if (obj.has(ref[0]) && this._contextObj) {
+                            obj.set(ref[0], this._contextObj.getGuid());
+                        }
+                        obj.set(this.nameattr, file.name);
+                        if (this.typeattr) {
+                            obj.set(this.typeattr, file.type);
+                        }
+                        file.obj = obj;
+                    } else {
+                        callback("Failed to create new file object");
+                    }
+
                     logger.debug("save document");
                     // We have create a commit,
                     // else the upload by URL will not works
